@@ -14,6 +14,7 @@ func Test_Single_String(t *testing.T) {
 
 	type testCase struct {
 		name          string
+		defaultValue  string
 		allowedValues []string
 		arguments     []string
 		expected      string
@@ -39,15 +40,23 @@ func Test_Single_String(t *testing.T) {
 			allowedValues: []string{"third"},
 		},
 		{
-			name:          "with allowed, no arguments",
+			name:          "with allowed, with default, no arguments",
 			allowedValues: []string{"third"},
+			defaultValue:  "third",
+			expected:      "third",
 		},
 		//negative scenarios
 		{
-			name:          "no default, with allowed, bad arguments",
+			name:          "with allowed, no default, bad arguments",
 			allowedValues: []string{"second", "third"},
 			arguments:     []string{"first"},
 			parseErr:      fmt.Errorf("invalid value \"first\" for flag -val: must be one of [second third]"),
+		},
+		{
+			name:          "with allowed, bad default, with arguments",
+			allowedValues: []string{"first", "second"},
+			defaultValue:  "third",
+			initErr:       fmt.Errorf("unexpected default value \"third\" for flag -val: must be one of [first second]"),
 		},
 		{
 			name:          "bad allowed, with arguments",
@@ -60,7 +69,7 @@ func Test_Single_String(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			flag := flag.NewFlagSet("test", flag.ContinueOnError)
-			selected, err := flagenum.Single(flag, "val", "enumerated parameter", func(s string) string { return s }, test.allowedValues)
+			selected, err := flagenum.Single(flag, "val", "enumerated parameter", func(s string) string { return s }, test.defaultValue, test.allowedValues)
 
 			if test.initErr != nil {
 				assert.EqualError(t, err, test.initErr.Error())

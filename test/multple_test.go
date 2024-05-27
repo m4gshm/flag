@@ -65,6 +65,12 @@ func Test_Multiple_String(t *testing.T) {
 			parseErr:      fmt.Errorf("invalid value \"first\" for flag -val: must be one of [second third]"),
 		},
 		{
+			name:          "no default, bad allowed, no arguments",
+			allowedValues: []string{"second", "second"},
+			arguments:     []string{"first"},
+			initErr:      fmt.Errorf("duplicated allowed value \"second\" for flag -val"),
+		},
+		{
 			name:          "bad default, with allowed, with arguments",
 			defaultValues: []string{"fifth"},
 			allowedValues: []string{"second", "third"},

@@ -18,8 +18,8 @@ func MultipleStrings(name string, usage string, defaulValues, allowedValues []st
 	return CommandLine.MultipleStrings(name, usage, defaulValues, allowedValues)
 }
 
-func SingleString(name string, usage string, allowedValues []string) *string {
-	return CommandLine.SingleString(name, usage, allowedValues)
+func SingleString(name string, usage string, value string, allowedValues []string) *string {
+	return CommandLine.SingleString(name, usage, value, allowedValues)
 }
 
 type Stringity interface {
@@ -42,8 +42,8 @@ func (f *FlagSetExtension) MultipleStrings(name string, usage string, defaulValu
 	return v
 }
 
-func (f *FlagSetExtension) SingleString(name string, usage string, allowedValues []string) *string {
-	v, err := Single(f.FlagSet, name, usage, func(s string) string { return s }, allowedValues)
+func (f *FlagSetExtension) SingleString(name string, usage string, value string, allowedValues []string) *string {
+	v, err := Single(f.FlagSet, name, usage, func(s string) string { return s }, value, allowedValues)
 	if err != nil {
 		panic(err)
 	}
@@ -51,7 +51,7 @@ func (f *FlagSetExtension) SingleString(name string, usage string, allowedValues
 }
 
 func Multiple[V Value](f *flag.FlagSet, name string, usage string, converter func(string) V, defaultValues, allowedValues []V) (*[]V, error) {
-	allowed, err := getUniques("allowed", name, allowedValues...)
+	allowedUniques, err := getUniques("allowed", name, allowedValues...)
 	if err != nil {
 		return nil, err
 	}
@@ -61,26 +61,31 @@ func Multiple[V Value](f *flag.FlagSet, name string, usage string, converter fun
 	}
 	if len(allowedValues) > 0 {
 		for _, defaultValue := range defaultValues {
-			if err := checkAllowed(defaultValue, allowedValues, allowed); err != nil {
-				return nil, fmt.Errorf("unexpected default value \"%v\" for flag -%s: %w", defaultValue, name, err)
+			if err := checkDefault(name, defaultValue, allowedValues, allowedUniques); err != nil {
+				return nil, err
 			}
 		}
 	}
 	values := multipleValues[V]{
 		name: name, values: slices.Clone(defaultValues), allowed: allowedValues, uniques: map[V]struct{}{},
-		defaults: defaultValues, allowedUniques: allowed, converter: converter,
+		defaults: defaultValues, allowedUniques: allowedUniques, converter: converter,
 	}
 	f.Var(&values, name, usage+getSuffix(usage, allowedValues...))
 	return &values.values, nil
 }
 
-func Single[V Value](f *flag.FlagSet, name string, usage string, converter func(string) V, allowedValues []V) (*V, error) {
-	allowed, err := getUniques("allowed", name, allowedValues...)
+func Single[V Value](f *flag.FlagSet, name string, usage string, converter func(string) V, value V, allowedValues []V) (*V, error) {
+	allowedUniques, err := getUniques("allowed", name, allowedValues...)
 	if err != nil {
 		return nil, err
 	}
 	var zero V
-	values := singleValue[V]{name: name, value: zero, allowed: allowedValues, allowedUniques: allowed, converter: converter}
+	if zero != value {
+		if err := checkDefault(name, value, allowedValues, allowedUniques); err != nil {
+			return nil, err
+		}
+	}
+	values := singleValue[V]{name: name, value: value, allowed: allowedValues, allowedUniques: allowedUniques, converter: converter}
 	f.Var(&values, name, usage+getSuffix(usage, allowedValues...))
 	return &values.value, nil
 }
@@ -115,6 +120,13 @@ func joinToString[T any](values ...T) string {
 		str.WriteString(fmt.Sprintf("%v", v))
 	}
 	return str.String()
+}
+
+func checkDefault[TS ~[]T, T Value](name string, defaultValue T, allowed TS, uniques map[T]struct{}) error {
+	if err := checkAllowed(defaultValue, allowed, uniques); err != nil {
+		return fmt.Errorf("unexpected default value \"%v\" for flag -%s: %w", defaultValue, name, err)
+	}
+	return nil
 }
 
 func checkAllowed[TS ~[]T, T Value](value T, allowed TS, uniques map[T]struct{}) error {
