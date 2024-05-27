@@ -14,20 +14,16 @@ func New(flagSet *flag.FlagSet) *FlagSetExtension {
 	return &FlagSetExtension{flagSet}
 }
 
-func MultipleStrings(name string, usage string) *[]string {
-	return CommandLine.MultipleStringsDefStrict(name, usage, nil, nil)
+func MultipleStrings(name string, usage string, defaulValues, allowedValues []string) *[]string {
+	return CommandLine.MultipleStrings(name, usage, defaulValues, allowedValues)
 }
 
-func MultiStringsDef(name string, usage string, defaultValues []string) *[]string {
-	return CommandLine.MultipleStringsDefStrict(name, usage, defaultValues, nil)
+func SingleString(name string, usage string, allowedValues []string) *string {
+	return CommandLine.SingleString(name, usage, allowedValues)
 }
 
-func MultiStringsStrict(name string, usage string, allowedValues []string) *[]string {
-	return CommandLine.MultipleStringsDefStrict(name, usage, nil, allowedValues)
-}
-
-func MultipleStringsDefStrict(name string, usage string, defaulValues, allowedValues []string) *[]string {
-	return CommandLine.MultipleStringsDefStrict(name, usage, defaulValues, allowedValues)
+type Stringity interface {
+	String() string
 }
 
 type Value interface {
@@ -38,8 +34,16 @@ type FlagSetExtension struct {
 	*flag.FlagSet
 }
 
-func (f *FlagSetExtension) MultipleStringsDefStrict(name string, usage string, defaulValues, allowedValues []string) *[]string {
+func (f *FlagSetExtension) MultipleStrings(name string, usage string, defaulValues, allowedValues []string) *[]string {
 	v, err := Multiple(f.FlagSet, name, usage, func(s string) string { return s }, defaulValues, allowedValues)
+	if err != nil {
+		panic(err)
+	}
+	return v
+}
+
+func (f *FlagSetExtension) SingleString(name string, usage string, allowedValues []string) *string {
+	v, err := Single(f.FlagSet, name, usage, func(s string) string { return s }, allowedValues)
 	if err != nil {
 		panic(err)
 	}
