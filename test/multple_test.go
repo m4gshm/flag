@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/m4gshm/flagenum/flagenum"
+	"github.com/m4gshm/flag/flagenum"
 )
 
 func Test_Multiple_String(t *testing.T) {

@@ -1,4 +1,4 @@
-module github.com/m4gshm/flagenum
+module github.com/m4gshm/flag
 
 go 1.20
 
