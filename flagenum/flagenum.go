@@ -42,7 +42,6 @@ func (f *FlagSetExtension) SingleString(name string, value string, allowedValues
 	return v
 }
 
-
 type Value interface {
 	cmp.Ordered
 }
@@ -203,7 +202,11 @@ type singleValue[T Value] struct {
 var _ flag.Value = (*multipleValues[string])(nil)
 
 func (f *singleValue[T]) String() string {
-	return joinToString(f.Value())
+	v := f.Value()
+	if v != nil {
+		return joinToString(*v)
+	}
+	return ""
 }
 
 func (f *singleValue[T]) Set(s string) error {

@@ -3,6 +3,7 @@ package test
 import (
 	"flag"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -90,4 +91,15 @@ func Test_Single_String(t *testing.T) {
 			}
 		})
 	}
+}
+
+func Test_Single_String_Usage(t *testing.T) {
+	out := &strings.Builder{}
+	flag := flag.NewFlagSet("test", flag.ContinueOnError)
+	flag.SetOutput(out)
+	flagenum.Single(flag, "val", "v1", []string{"v1", "v2"}, func(s string) string { return s }, "enumerated parameter")
+
+	flag.Usage()
+
+	assert.Equal(t, "Usage of test:\n  -val value\n    \tenumerated parameter (allowed: [v1 v2]) (default v1)\n", out.String())
 }
