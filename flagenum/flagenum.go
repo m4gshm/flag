@@ -14,43 +14,40 @@ func New(flagSet *flag.FlagSet) *FlagSetExtension {
 	return &FlagSetExtension{flagSet}
 }
 
-func MultipleStrings(name string, usage string, defaulValues, allowedValues []string) *[]string {
-	return CommandLine.MultipleStrings(name, usage, defaulValues, allowedValues)
+func MultipleStrings(name string, defaulValues, allowedValues []string, usage string) *[]string {
+	return CommandLine.MultipleStrings(name, defaulValues, allowedValues, usage)
 }
 
-func SingleString(name string, usage string, value string, allowedValues []string) *string {
-	return CommandLine.SingleString(name, usage, value, allowedValues)
-}
-
-type Stringity interface {
-	String() string
-}
-
-type Value interface {
-	cmp.Ordered
+func SingleString(name string, value string, allowedValues []string, usage string) *string {
+	return CommandLine.SingleString(name, usage, allowedValues, value)
 }
 
 type FlagSetExtension struct {
 	*flag.FlagSet
 }
 
-func (f *FlagSetExtension) MultipleStrings(name string, usage string, defaulValues, allowedValues []string) *[]string {
-	v, err := Multiple(f.FlagSet, name, usage, func(s string) string { return s }, defaulValues, allowedValues)
+func (f *FlagSetExtension) MultipleStrings(name string, defaulValues, allowedValues []string, usage string) *[]string {
+	v, err := Multiple(f.FlagSet, name, defaulValues, allowedValues, func(s string) string { return s }, usage)
 	if err != nil {
 		panic(err)
 	}
 	return v
 }
 
-func (f *FlagSetExtension) SingleString(name string, usage string, value string, allowedValues []string) *string {
-	v, err := Single(f.FlagSet, name, usage, func(s string) string { return s }, value, allowedValues)
+func (f *FlagSetExtension) SingleString(name string, value string, allowedValues []string, usage string) *string {
+	v, err := Single(f.FlagSet, name, value, allowedValues, func(s string) string { return s }, usage)
 	if err != nil {
 		panic(err)
 	}
 	return v
 }
 
-func Multiple[V Value](f *flag.FlagSet, name string, usage string, converter func(string) V, defaultValues, allowedValues []V) (*[]V, error) {
+
+type Value interface {
+	cmp.Ordered
+}
+
+func Multiple[V Value](f *flag.FlagSet, name string, defaultValues, allowedValues []V, converter func(string) V, usage string) (*[]V, error) {
 	allowedUniques, err := getUniques("allowed", name, allowedValues...)
 	if err != nil {
 		return nil, err
@@ -74,7 +71,7 @@ func Multiple[V Value](f *flag.FlagSet, name string, usage string, converter fun
 	return &values.values, nil
 }
 
-func Single[V Value](f *flag.FlagSet, name string, usage string, converter func(string) V, value V, allowedValues []V) (*V, error) {
+func Single[V Value](f *flag.FlagSet, name string, value V, allowedValues []V, converter func(string) V, usage string) (*V, error) {
 	allowedUniques, err := getUniques("allowed", name, allowedValues...)
 	if err != nil {
 		return nil, err

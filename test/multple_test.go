@@ -68,7 +68,7 @@ func Test_Multiple_String(t *testing.T) {
 			name:          "no default, bad allowed, no arguments",
 			allowedValues: []string{"second", "second"},
 			arguments:     []string{"first"},
-			initErr:      fmt.Errorf("duplicated allowed value \"second\" for flag -val"),
+			initErr:       fmt.Errorf("duplicated allowed value \"second\" for flag -val"),
 		},
 		{
 			name:          "bad default, with allowed, with arguments",
@@ -82,7 +82,7 @@ func Test_Multiple_String(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			flag := flag.NewFlagSet("test", flag.ContinueOnError)
-			selected, err := flagenum.Multiple(flag, "val", "enumerated parameter", func(s string) string { return s }, test.defaultValues, test.allowedValues)
+			selected, err := flagenum.Multiple(flag, "val", test.defaultValues, test.allowedValues, func(s string) string { return s }, "enumerated parameter")
 
 			if test.initErr != nil {
 				assert.EqualError(t, err, test.initErr.Error())

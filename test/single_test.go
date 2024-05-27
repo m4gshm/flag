@@ -69,7 +69,7 @@ func Test_Single_String(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			flag := flag.NewFlagSet("test", flag.ContinueOnError)
-			selected, err := flagenum.Single(flag, "val", "enumerated parameter", func(s string) string { return s }, test.defaultValue, test.allowedValues)
+			selected, err := flagenum.Single(flag, "val", test.defaultValue, test.allowedValues, func(s string) string { return s }, "enumerated parameter")
 
 			if test.initErr != nil {
 				assert.EqualError(t, err, test.initErr.Error())
