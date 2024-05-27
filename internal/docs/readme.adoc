@@ -2,7 +2,7 @@
 
 == Flag
 
-Extends core flag package by addition implementations like multi values argument or limited to predefined varians.
+Extends the core flag package by adding implementations, such as an argument with multiple values or an argument limited to predefined options.
 
 === Example
 source `example.go`:

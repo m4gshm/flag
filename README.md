@@ -1,6 +1,8 @@
 # Flag
 
-todo
+Extends the core flag package by adding implementations, such as an
+argument with multiple values or an argument limited to predefined
+options.
 
 ## Example
 
@@ -20,14 +22,14 @@ func main() {
     var (
         api = flagenum.MultipleStrings(
             "api",
-            []string{"rest", "grpc"}/*default*/,
-            []string{"rest", "grpc", "soap"}/*allowed*/,
+            []string{"rest", "grpc"},         /*default*/
+            []string{"rest", "grpc", "soap"}, /*allowed*/
             "enabled api engine",
         )
         logLevel = flagenum.SingleString(
             "log-level",
-            "info"/*default*/,
-            []string{"debug", "info", "warn", "error"}/*allowed*/,
+            "info", /*default*/
+            []string{"debug", "info", "warn", "error"}, /*allowed*/
             "logger level",
         )
     )
