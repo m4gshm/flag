@@ -19,7 +19,7 @@ func MultipleStrings(name string, defaulValues, allowedValues []string, usage st
 }
 
 func SingleString(name string, value string, allowedValues []string, usage string) *string {
-	return CommandLine.SingleString(name, usage, allowedValues, value)
+	return CommandLine.SingleString(name, value, allowedValues, usage)
 }
 
 type FlagSetExtension struct {
