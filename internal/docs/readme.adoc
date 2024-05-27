@@ -1,0 +1,34 @@
+= Flag
+
+== Flag
+
+todo
+
+
+=== Example
+source `example.go`:
+
+[source,go]
+----
+include::../example/example.go[]
+----
+
+Command `go run .`
+will print:
+[source,console]
+----
+include::./run1.txt[]
+----
+
+To change defaults need set arguments like `go run . --api soap --api rest --log-level debug`
+[source,console]
+----
+include::./run2.txt[]
+----
+
+Call `go run . --help` to get usage info:
+[source,console]
+----
+Usage of example:
+include::./usage.txt[lines=2..-1]
+----

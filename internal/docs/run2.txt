@@ -1,0 +1,2 @@
+enabled apis: [soap rest]
+log level:    debug

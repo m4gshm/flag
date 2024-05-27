@@ -1,5 +1,5 @@
 .PHONY: all
-all: build test
+all: build test readme
 
 .PHONY: test
 test:
@@ -28,5 +28,8 @@ lint:
 .PHONY: readme
 readme:
 	$(info #README.md...)
+	cd internal/example && go run . > ../docs/run1.txt
+	cd internal/example && go run . --api soap --api rest --log-level debug > ../docs/run2.txt
+	cd internal/example && go run . --help > ../docs/usage.txt 2>&1 
 	asciidoctor -b docbook internal/docs/readme.adoc 
 	pandoc -f docbook -t gfm internal/docs/readme.xml -o README.md

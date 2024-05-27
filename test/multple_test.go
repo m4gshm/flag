@@ -110,7 +110,7 @@ func Test_Multiple_String_Usage(t *testing.T) {
 	out := &strings.Builder{}
 	flag := flag.NewFlagSet("test", flag.ContinueOnError)
 	flag.SetOutput(out)
-	flagenum.Multiple(flag, "val", []string{"v1", "v3"}, []string{"v1", "v2", "v3"}, func(s string) string { return s }, "enumerated parameter")
+	_, _ = flagenum.Multiple(flag, "val", []string{"v1", "v3"}, []string{"v1", "v2", "v3"}, func(s string) string { return s }, "enumerated parameter")
 
 	flag.Usage()
 

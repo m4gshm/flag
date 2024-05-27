@@ -97,7 +97,7 @@ func Test_Single_String_Usage(t *testing.T) {
 	out := &strings.Builder{}
 	flag := flag.NewFlagSet("test", flag.ContinueOnError)
 	flag.SetOutput(out)
-	flagenum.Single(flag, "val", "v1", []string{"v1", "v2"}, func(s string) string { return s }, "enumerated parameter")
+	_, _ = flagenum.Single(flag, "val", "v1", []string{"v1", "v2"}, func(s string) string { return s }, "enumerated parameter")
 
 	flag.Usage()
 

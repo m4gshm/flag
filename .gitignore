@@ -1,0 +1,4 @@
+bin/
+__debug_bin
+internal/docs/readme.xml
+.DS_Store

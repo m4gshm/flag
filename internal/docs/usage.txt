@@ -1,0 +1,5 @@
+Usage of C:\Users\ALEXAN~1\AppData\Local\Temp\go-build3914738036\b001\exe\example.exe:
+  -api value
+    	enabled api engine (allowed: [rest grpc soap]) (default [rest grpc])
+  -log-level value
+    	logger level (allowed: [debug info warn error]) (default info)
