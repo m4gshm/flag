@@ -2,8 +2,7 @@
 
 == Flag
 
-todo
-
+Extends core flag package by addition implementations like multi values argument or limited to predefined varians.
 
 === Example
 source `example.go`:
