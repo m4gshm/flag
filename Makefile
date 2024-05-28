@@ -12,11 +12,6 @@ build:
 	$(info #Building...)
 	go build ./...
 
-.PHONY: build-vcs-false
-build-vcs-false:
-	$(info #Building...)
-	go build --buildvcs=false ./...
-
 .PHONY: lint
 lint:
 	$(info #Lints...)
