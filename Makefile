@@ -13,7 +13,7 @@ build:
 	go build ./...
 
 .PHONY: build-vcs-false
-build:
+build-vcs-false:
 	$(info #Building...)
 	go build --buildvcs=false ./...
 
