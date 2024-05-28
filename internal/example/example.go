@@ -17,7 +17,7 @@ func main() {
 		)
 		logLevel = flagenum.SingleString(
 			"log-level",
-			"info", /*default*/
+			"info",                                     /*default*/
 			[]string{"debug", "info", "warn", "error"}, /*allowed*/
 			"logger level",
 		)

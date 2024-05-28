@@ -29,5 +29,5 @@ jobs:
       - name: run tests
         uses: docker://golang:1.22-bullseye
         with:
-          args: make build test lint
+          args: make build-vcs-false test lint
 
