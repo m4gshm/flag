@@ -63,7 +63,7 @@ func Test_Multiple_String(t *testing.T) {
 			name:          "no default, with allowed, bad arguments",
 			allowedValues: []string{"second", "third"},
 			arguments:     []string{"first"},
-			parseErr:      fmt.Errorf("invalid value \"first\" for flag -val: must be one of [second third]"),
+			parseErr:      fmt.Errorf("invalid value \"first\" for flag -val: must be one of second,third"),
 		},
 		{
 			name:          "no default, bad allowed, no arguments",
@@ -76,14 +76,15 @@ func Test_Multiple_String(t *testing.T) {
 			defaultValues: []string{"fifth"},
 			allowedValues: []string{"second", "third"},
 			arguments:     []string{"second"},
-			initErr:       fmt.Errorf("unexpected default value \"fifth\" for flag -val: must be one of [second third]"),
+			initErr:       fmt.Errorf("unexpected default value \"fifth\" for flag -val: must be one of second,third"),
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			flag := flag.NewFlagSet("test", flag.ContinueOnError)
-			selected, err := flagenum.Multiple(flag, "val", test.defaultValues, test.allowedValues, func(s string) string { return s }, "enumerated parameter")
+
+			selected, err := flagenum.Multiple(flag, "val", test.defaultValues, test.allowedValues, strAsIs, strAsIs, "enumerated parameter")
 
 			if test.initErr != nil {
 				assert.EqualError(t, err, test.initErr.Error())
@@ -110,9 +111,13 @@ func Test_Multiple_String_Usage(t *testing.T) {
 	out := &strings.Builder{}
 	flag := flag.NewFlagSet("test", flag.ContinueOnError)
 	flag.SetOutput(out)
-	_, _ = flagenum.Multiple(flag, "val", []string{"v1", "v3"}, []string{"v1", "v2", "v3"}, func(s string) string { return s }, "enumerated parameter")
+	_, _ = flagenum.Multiple(flag, "val", []string{"v1", "v3"}, []string{"v1", "v2", "v3"}, strAsIs, strAsIs, "enumerated parameter")
 
 	flag.Usage()
 
-	assert.Equal(t, "Usage of test:\n  -val value\n    \tenumerated parameter (allowed: [v1 v2 v3]) (default [v1 v3])\n", out.String())
+	assert.Equal(t, "Usage of test:\n  -val value\n    \tenumerated parameter (allowed any of v1,v2,v3) (default v1,v3)\n", out.String())
+}
+
+func strAsIs(s string) string {
+	return s
 }

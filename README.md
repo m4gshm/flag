@@ -28,7 +28,7 @@ func main() {
         )
         logLevel = flagenum.SingleString(
             "log-level",
-            "info",                                     /*default*/
+            "info", /*default*/
             []string{"debug", "info", "warn", "error"}, /*allowed*/
             "logger level",
         )
@@ -60,7 +60,7 @@ Call `go run . --help` to get usage info:
 ``` console
 Usage of example:
   -api value
-        enabled api engine (allowed: [rest grpc soap]) (default [rest grpc])
+        enabled api engine (allowed any of rest,grpc,soap) (default rest,grpc)
   -log-level value
-        logger level (allowed: [debug info warn error]) (default info)
+        logger level (allowed one of debug,info,warn,error) (default info)
 ```
