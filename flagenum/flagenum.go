@@ -4,7 +4,6 @@ import (
 	"cmp"
 	"flag"
 	"fmt"
-	"slices"
 	"strings"
 )
 
@@ -72,46 +71,68 @@ type Value interface {
 // The allowed values restrict possible values of the flag.
 // Returns the address of a slice that stores values of the flag and an error if something wrong.
 func Multiple[V Value](flagSet *flag.FlagSet, name string, defaultValues, allowedValues []V, toVConv func(string) V, toStrConv func(V) string, usage string) (*[]V, error) {
+	var result []V
+	return &result, MultipleVar(flagSet, &result, name, defaultValues, allowedValues, toVConv, toStrConv, usage)
+}
+
+// MultipleVar defines a generic slice flag with specified name, default values, allowed values, string converters and usage string.
+// The allowed values restrict possible values of the flag.
+// The argument p points to a slice variable in which to store values of the flag.
+// Returns an error if something wrong.
+func MultipleVar[V Value](flagSet *flag.FlagSet, p *[]V, name string, defaultValues, allowedValues []V, toVConv func(string) V, toStrConv func(V) string, usage string) error {
 	allowedUniques, err := getUniques("allowed", name, allowedValues...)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	_, err = getUniques("default", name, defaultValues...)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	if len(allowedValues) > 0 {
 		for _, defaultValue := range defaultValues {
 			if err := checkDefault(name, defaultValue, allowedValues, allowedUniques, toStrConv); err != nil {
-				return nil, err
+				return err
 			}
 		}
 	}
+
+	*p = append(*p, defaultValues...)
 	values := multipleValues[V]{
-		name: name, values: slices.Clone(defaultValues), allowed: allowedValues, uniques: map[V]struct{}{},
+		name: name, values: p, allowed: allowedValues, uniques: map[V]struct{}{},
 		defaults: defaultValues, allowedUniques: allowedUniques, toVConv: toVConv, toStrConv: toStrConv,
 	}
 	flagSet.Var(&values, name, usage+getSuffix(usage, "any of", toStrConv, allowedValues...))
-	return &values.values, nil
+	return nil
 }
 
 // Single defines a generic flag with specified name, default value, allowed values, string converters and usage string.
 // The allowed values restrict possible value of the flag.
 // Returns the address of a variable that stores value of the flag and an error if something wrong.
 func Single[V Value](flagSet *flag.FlagSet, name string, value V, allowedValues []V, toVConv func(string) V, toStrConv func(V) string, usage string) (*V, error) {
+
+	result := value
+	return &result, SingleVar(flagSet, &result, name, value, allowedValues, toVConv, toStrConv, usage)
+}
+
+// SingleVar defines a generic flag with specified name, default value, allowed values, string converters and usage string.
+// The allowed values restrict possible value of the flag.
+// The argument p points to a string variable in which to store the value of the flag.
+// Returns an error if something wrong.
+func SingleVar[V Value](flagSet *flag.FlagSet, p *V, name string, value V, allowedValues []V, toVConv func(string) V, toStrConv func(V) string, usage string) error {
 	allowedUniques, err := getUniques("allowed", name, allowedValues...)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	var zero V
 	if zero != value {
 		if err := checkDefault(name, value, allowedValues, allowedUniques, toStrConv); err != nil {
-			return nil, err
+			return err
 		}
 	}
-	values := singleValue[V]{name: name, value: value, allowed: allowedValues, allowedUniques: allowedUniques, toVConv: toVConv, toStrConv: toStrConv}
+	*p = value
+	values := singleValue[V]{name: name, value: p, allowed: allowedValues, allowedUniques: allowedUniques, toVConv: toVConv, toStrConv: toStrConv}
 	flagSet.Var(&values, name, usage+getSuffix(usage, "one of", toStrConv, allowedValues...))
-	return &values.value, nil
+	return nil
 }
 
 func getSuffix[T any](usage, countStr string, toStrConv func(T) string, allowedValues ...T) string {
@@ -177,7 +198,7 @@ var void struct{}
 
 type multipleValues[T Value] struct {
 	name           string
-	values         []T
+	values         *[]T
 	defaults       []T
 	allowed        []T
 	uniques        map[T]struct{}
@@ -193,14 +214,14 @@ func (f *multipleValues[T]) String() string {
 	v := f.Values()
 	c := f.toStrConv
 	if v != nil && c != nil {
-		return joinToString(f.toStrConv, f.Values()...)
+		return joinToString(f.toStrConv, v...)
 	}
 	return ""
 }
 
 func (f *multipleValues[T]) Set(s string) error {
 	if !f.defaultCleared {
-		f.values = nil
+		*f.values = nil
 		f.defaultCleared = true
 	}
 	v := f.toVConv(s)
@@ -210,7 +231,7 @@ func (f *multipleValues[T]) Set(s string) error {
 	if err := checkAllowed(v, f.allowed, f.allowedUniques, f.toStrConv); err != nil {
 		return err
 	}
-	f.values = append(f.values, v)
+	*f.values = append(*f.values, v)
 	return nil
 }
 
@@ -219,15 +240,15 @@ func (f *multipleValues[T]) Get() any {
 }
 
 func (f *multipleValues[T]) Values() []T {
-	if v := f.values; len(v) > 0 {
-		return v
+	if v := f.values; v != nil && len(*v) > 0 {
+		return *v
 	}
 	return f.defaults
 }
 
 type singleValue[T Value] struct {
 	name           string
-	value          T
+	value          *T
 	allowed        []T
 	allowedUniques map[T]struct{}
 	toVConv        func(string) T
@@ -250,7 +271,7 @@ func (f *singleValue[T]) Set(s string) error {
 	if err := checkAllowed(v, f.allowed, f.allowedUniques, f.toStrConv); err != nil {
 		return err
 	}
-	f.value = v
+	*f.value = v
 	return nil
 }
 
@@ -259,5 +280,5 @@ func (f *singleValue[T]) Get() any {
 }
 
 func (f *singleValue[T]) Value() *T {
-	return &f.value
+	return f.value
 }

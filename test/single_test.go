@@ -67,28 +67,37 @@ func Test_Single_String(t *testing.T) {
 		},
 	}
 
+	assertCase := func(test testCase, flag *flag.FlagSet, selected *string, err error) {
+		if test.initErr != nil {
+			assert.EqualError(t, err, test.initErr.Error())
+		} else {
+
+			a := []string{}
+			for _, arg := range test.arguments {
+				a = append(a, "--val", arg)
+			}
+
+			err = flag.Parse(a)
+			if test.parseErr != nil {
+				assert.EqualError(t, err, test.parseErr.Error())
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, test.expected, *selected)
+			}
+		}
+	}
+
 	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
+		t.Run("Single:"+test.name, func(t *testing.T) {
 			flag := flag.NewFlagSet("test", flag.ContinueOnError)
 			selected, err := flagenum.Single(flag, "val", test.defaultValue, test.allowedValues, strAsIs, strAsIs, "enumerated parameter")
-
-			if test.initErr != nil {
-				assert.EqualError(t, err, test.initErr.Error())
-			} else {
-
-				a := []string{}
-				for _, arg := range test.arguments {
-					a = append(a, "--val", arg)
-				}
-
-				err = flag.Parse(a)
-				if test.parseErr != nil {
-					assert.EqualError(t, err, test.parseErr.Error())
-				} else {
-					assert.NoError(t, err)
-					assert.Equal(t, test.expected, *selected)
-				}
-			}
+			assertCase(test, flag, selected, err)
+		})
+		t.Run("SingleVar:"+test.name, func(t *testing.T) {
+			flag := flag.NewFlagSet("test", flag.ContinueOnError)
+			var selected string
+			err := flagenum.SingleVar(flag, &selected, "val", test.defaultValue, test.allowedValues, strAsIs, strAsIs, "enumerated parameter")
+			assertCase(test, flag, &selected, err)
 		})
 	}
 }

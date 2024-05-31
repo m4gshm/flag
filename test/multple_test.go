@@ -58,6 +58,11 @@ func Test_Multiple_String(t *testing.T) {
 			name:          "no default, with allowed, no arguments",
 			allowedValues: []string{"third"},
 		},
+		{
+			name:      "no default, no allowed, with arguments",
+			arguments: []string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29"},
+			expected:  []string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29"},
+		},
 		//negative scenarios
 		{
 			name:          "no default, with allowed, bad arguments",
@@ -80,29 +85,40 @@ func Test_Multiple_String(t *testing.T) {
 		},
 	}
 
+	assertCase := func(test testCase, flag *flag.FlagSet, selected *[]string, err error) {
+		if test.initErr != nil {
+			assert.EqualError(t, err, test.initErr.Error())
+		} else {
+
+			a := []string{}
+			for _, arg := range test.arguments {
+				a = append(a, "--val", arg)
+			}
+
+			err = flag.Parse(a)
+			if test.parseErr != nil {
+				assert.EqualError(t, err, test.parseErr.Error())
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, test.expected, *selected)
+			}
+		}
+	}
+
 	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
+		t.Run("MultipleVar:"+test.name, func(t *testing.T) {
+			flag := flag.NewFlagSet("test", flag.ContinueOnError)
+			var selected []string
+			err := flagenum.MultipleVar(flag, &selected, "val", test.defaultValues, test.allowedValues, strAsIs, strAsIs, "enumerated parameter")
+			assertCase(test, flag, &selected, err)
+		})
+
+		t.Run("Multiple:"+test.name, func(t *testing.T) {
 			flag := flag.NewFlagSet("test", flag.ContinueOnError)
 
 			selected, err := flagenum.Multiple(flag, "val", test.defaultValues, test.allowedValues, strAsIs, strAsIs, "enumerated parameter")
 
-			if test.initErr != nil {
-				assert.EqualError(t, err, test.initErr.Error())
-			} else {
-
-				a := []string{}
-				for _, arg := range test.arguments {
-					a = append(a, "--val", arg)
-				}
-
-				err = flag.Parse(a)
-				if test.parseErr != nil {
-					assert.EqualError(t, err, test.parseErr.Error())
-				} else {
-					assert.NoError(t, err)
-					assert.Equal(t, test.expected, *selected)
-				}
-			}
+			assertCase(test, flag, selected, err)
 		})
 	}
 }
