@@ -15,20 +15,20 @@ func New(flagSet *flag.FlagSet) *FlagSetExtension {
 	return &FlagSetExtension{flagSet}
 }
 
-// MultipleStrings defines a string slice flag with specified name, default values, allowed values and usage string.
+// Strings defines a string slice flag with specified name, default values, allowed values and usage string.
 // The allowed values restrict possible values of the flag.
 // If allowed values are defined then an unexpected flag value will cause a panic.
 // The return value is the address of a slice that stores values of the flag.
-func MultipleStrings(name string, defaulValues, allowedValues []string, usage string) *[]string {
-	return CommandLine.MultipleStrings(name, defaulValues, allowedValues, usage)
+func Strings(name string, defaulValues, allowedValues []string, usage string) *[]string {
+	return CommandLine.Strings(name, defaulValues, allowedValues, usage)
 }
 
-// SingleString defines a string flag with specified name, default value, allowed values and usage string.
+// String defines a string flag with specified name, default value, allowed values and usage string.
 // The allowed values restrict possible value of the flag.
 // If allowed values are defined then an unexpected flag value will cause a panic.
 // The return value is the address of a slice that stores value of the flag.
-func SingleString(name string, value string, allowedValues []string, usage string) *string {
-	return CommandLine.SingleString(name, value, allowedValues, usage)
+func String(name string, value string, allowedValues []string, usage string) *string {
+	return CommandLine.String(name, value, allowedValues, usage)
 }
 
 // FlagSetExtension extends a FlagSet by addition flag types.
@@ -36,11 +36,11 @@ type FlagSetExtension struct {
 	*flag.FlagSet
 }
 
-// MultipleStrings defines a string slice flag with specified name, default values, allowed values and usage string.
+// Strings defines a string slice flag with specified name, default values, allowed values and usage string.
 // The allowed values restrict possible values of the flag.
 // If allowed values are defined then an unexpected flag value will cause a panic.
 // The return value is the address of a slice that stores values of the flag.
-func (f *FlagSetExtension) MultipleStrings(name string, defaulValues, allowedValues []string, usage string) *[]string {
+func (f *FlagSetExtension) Strings(name string, defaulValues, allowedValues []string, usage string) *[]string {
 	v, err := Multiple(f.FlagSet, name, defaulValues, allowedValues, strAsIs, strAsIs, usage)
 	if err != nil {
 		panic(err)
@@ -48,11 +48,11 @@ func (f *FlagSetExtension) MultipleStrings(name string, defaulValues, allowedVal
 	return v
 }
 
-// SingleString defines a string flag with specified name, default value, allowed values and usage string.
+// String defines a string flag with specified name, default value, allowed values and usage string.
 // The allowed values restrict possible value of the flag.
 // If allowed values are defined then an unexpected flag value will cause a panic.
 // The return value is the address of a slice that stores value of the flag.
-func (f *FlagSetExtension) SingleString(name string, value string, allowedValues []string, usage string) *string {
+func (f *FlagSetExtension) String(name string, value string, allowedValues []string, usage string) *string {
 	v, err := Single(f.FlagSet, name, value, allowedValues, strAsIs, strAsIs, usage)
 	if err != nil {
 		panic(err)
