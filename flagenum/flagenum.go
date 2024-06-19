@@ -109,7 +109,6 @@ func MultipleVar[V Value](flagSet *flag.FlagSet, p *[]V, name string, defaultVal
 // The allowed values restrict possible value of the flag.
 // Returns the address of a variable that stores value of the flag and an error if something wrong.
 func Single[V Value](flagSet *flag.FlagSet, name string, value V, allowedValues []V, toVConv func(string) V, toStrConv func(V) string, usage string) (*V, error) {
-
 	result := value
 	return &result, SingleVar(flagSet, &result, name, value, allowedValues, toVConv, toStrConv, usage)
 }
@@ -138,7 +137,7 @@ func SingleVar[V Value](flagSet *flag.FlagSet, p *V, name string, value V, allow
 func getSuffix[T any](usage, countStr string, toStrConv func(T) string, allowedValues ...T) string {
 	suffix := ""
 	if len(allowedValues) > 0 {
-		suffix = "(allowed " + countStr + " " + joinToString(toStrConv, allowedValues...) + ")"
+		suffix = "(allowed `" + countStr + " " + joinToString(toStrConv, allowedValues...) + "`)"
 	}
 	if len(usage) > 0 {
 		suffix = " " + suffix

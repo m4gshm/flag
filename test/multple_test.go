@@ -131,7 +131,7 @@ func Test_Multiple_String_Usage(t *testing.T) {
 
 	flag.Usage()
 
-	assert.Equal(t, "Usage of test:\n  -val value\n    \tenumerated parameter (allowed any of v1,v2,v3) (default v1,v3)\n", out.String())
+	assert.Equal(t, "Usage of test:\n  -val any of v1,v2,v3\n    \tenumerated parameter (allowed any of v1,v2,v3) (default v1,v3)\n", out.String())
 }
 
 func strAsIs(s string) string {

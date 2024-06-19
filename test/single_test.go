@@ -110,5 +110,5 @@ func Test_Single_String_Usage(t *testing.T) {
 
 	flag.Usage()
 
-	assert.Equal(t, "Usage of test:\n  -val value\n    \tenumerated parameter (allowed one of v1,v2) (default v1)\n", out.String())
+	assert.Equal(t, "Usage of test:\n  -val one of v1,v2\n    \tenumerated parameter (allowed one of v1,v2) (default v1)\n", out.String())
 }

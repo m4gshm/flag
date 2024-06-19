@@ -59,8 +59,8 @@ Call `go run . --help` to get usage info:
 
 ``` console
 Usage of example:
-  -api value
+  -api any of rest,grpc,soap
         enabled api engine (allowed any of rest,grpc,soap) (default rest,grpc)
-  -log-level value
+  -log-level one of debug,info,warn,error
         logger level (allowed one of debug,info,warn,error) (default info)
 ```
