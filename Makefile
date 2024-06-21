@@ -30,6 +30,6 @@ readme:
 	$(info #README.md...)
 	cd internal/example && go run . > ../docs/run1.txt
 	cd internal/example && go run . --api soap --api rest --log-level debug > ../docs/run2.txt
-	cd internal/example && go run . --help > ../docs/usage.txt 2>&1 
+	cd internal/example && go run . --help > ../docs/usage.txt 2>&1 && tail -n +2 "../docs/usage.txt" > "../docs/usage.tmp" && mv ../docs/usage.tmp ../docs/usage.txt
 	asciidoctor -b docbook internal/docs/readme.adoc 
 	pandoc -f docbook -t gfm internal/docs/readme.xml -o README.md

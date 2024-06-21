@@ -20,13 +20,13 @@ import (
 
 func main() {
     var (
-        api = flagenum.Strings(
+        api = flagenum.MultipleStrings(
             "api",
             []string{"rest", "grpc"},         /*default*/
             []string{"rest", "grpc", "soap"}, /*allowed*/
             "enabled api engine",
         )
-        logLevel = flagenum.String(
+        logLevel = flagenum.SingleString(
             "log-level",
             "info", /*default*/
             []string{"debug", "info", "warn", "error"}, /*allowed*/

@@ -29,5 +29,5 @@ Call `go run . --help` to get usage info:
 [source,console]
 ----
 Usage of example:
-include::./usage.txt[lines=2..-1]
+include::./usage.txt[]
 ----
